@@ -127,7 +127,7 @@ export default class Parser {
     const args: string[] = content.split(/[ ]+/);
     const name: string | undefined = args?.shift()?.toLowerCase();
 
-    const prefix: string = '!';
+    const prefix: string = process.env.DEFAULT_PREFIX || ';';
 
     if (!name?.startsWith(prefix)) return;
 
