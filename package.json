@@ -1,0 +1,29 @@
+{
+  "name": "ep-notifier",
+  "version": "1.0.0",
+  "description": "A discord bot that notifies on new episodes on kayoanime",
+  "main": "index.js",
+  "scripts": {
+    "start": "node ./out/index.js",
+    "dev": "nodemon ./src/index.ts",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc",
+    "clean": "rm -rf ./out"
+  },
+  "keywords": [],
+  "author": "ReignLeaf",
+  "license": "ISC",
+  "dependencies": {
+    "chalk": "4.1.2",
+    "discord.js": "^13.6.0",
+    "dotenv": "^16.0.0",
+    "mongoose": "^6.3.0",
+    "puppeteer": "^13.7.0",
+    "puppeteer-extra": "^3.2.3",
+    "puppeteer-extra-plugin-stealth": "^2.9.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.15",
+    "ts-node": "^10.9.1"
+  }
+}
