@@ -6,12 +6,14 @@ import path from 'path';
 import fs from 'fs';
 import Database from './Database';
 import Browser from './Browser';
+import Schedular from './Schedular';
 
 export default class Client {
   private static instance: Client;
   private readonly client: Discord.Client;
   public readonly parser: Parser;
   public readonly database: Database;
+  public readonly schedular: Schedular;
   private readonly logger: ILogger = new Logger(this);
   private readonly browser: Browser;
   private readonly commandSearchPaths: string[] = [
@@ -30,6 +32,7 @@ export default class Client {
     this.parser = new Parser(this.client, {
       commandSearchPaths: this.commandSearchPaths,
     });
+    this.schedular = Schedular.getInstance();
 
     this.client.on('ready', () => console.log('Ready'));
 
@@ -39,9 +42,10 @@ export default class Client {
   }
 
   public async init() {
-    // await this.database.init();
+    await this.database.init();
     await this.browser.init();
     this.client.login(process.env.DISCORD_TOKEN);
+    // this.schedular.schedule();
   }
 
   public static getInstance(): Client {

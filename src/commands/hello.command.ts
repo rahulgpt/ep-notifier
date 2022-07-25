@@ -1,22 +1,15 @@
 import { Command } from '../lib';
-import { CommandCallbackArguments } from '../lib/types';
-import KayoScraper from '../scrapers/KayoScraper';
 
 export default class Hello extends Command {
   constructor() {
     super({
       name: 'hello',
-      description: 'Reply hi to hello',
+      description: 'Reply with hello in Japanese',
       args: [],
     });
   }
 
-  public async run({ channel }: CommandCallbackArguments) {
-    const scraper = new KayoScraper();
-    console.log(await scraper.getEpisodeCount());
-
-    channel.send(`${await scraper.getEpisodeCount()}`);
-
+  public async run() {
     return "Kon'nichiwa 👋";
   }
 }

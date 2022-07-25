@@ -20,7 +20,10 @@ export default class GenericMessage {
     embed.title = `Error`;
     embed.description = `${content}`;
     embed.addField('Reason', reason);
-    embed.addField('Format', `!${command.name} ${argsString}`);
+    embed.addField(
+      'Format',
+      `${process.env.DEFAULT_PREFIX}${command.name} ${argsString}`
+    );
     // embed.thumbnail = {
     //   url: 'https://media.discordapp.net/attachments/969222381317021746/969226663424585728/92428e727dc23064444954523ce2a970.jpg',
     // };
@@ -35,5 +38,11 @@ export default class GenericMessage {
     embed.description = content;
 
     message.channel.send({ embeds: [embed] });
+  }
+
+  public static send(message: Message, content: string) {
+    message.channel.send({
+      embeds: [new MessageEmbed({ color: 0x2f3136, description: content })],
+    });
   }
 }

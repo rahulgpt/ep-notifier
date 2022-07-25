@@ -9,11 +9,12 @@ import {
 } from 'discord.js';
 
 export type CommandOptions = {
+  ownerOnly?: boolean;
+  permissions?: string[];
+  roles?: string[];
   name: string;
   description?: string;
   args: CommandArgType[];
-  clientPermissions?: string[];
-  requiredRoles?: string[];
 };
 
 export type CommandArgType = {
@@ -26,7 +27,8 @@ export enum CommandOptionTypes {
   STRING = 'string',
   NUMBER = 'number',
   BOOL = 'bool',
-  URL = 'url',
+  KAYO_DRIVE_URL = 'kayoDriveUrl',
+  GOGO_URL = 'gogoUrl',
 }
 
 export type CommandCallbackArguments = {
@@ -38,5 +40,5 @@ export type CommandCallbackArguments = {
     | TextChannel
     | ThreadChannel;
   client: Client;
-  args: string[];
+  args: any[];
 };

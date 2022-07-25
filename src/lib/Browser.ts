@@ -34,11 +34,6 @@ export default class Browser {
     await page.type('input[type="password"]', process.env.G_PASSWORD!);
     await page.waitForSelector('#passwordNext');
     await page.click('#passwordNext');
-
-    setTimeout(
-      async () => await page.screenshot({ path: 'loginSS.png' }),
-      8000
-    );
   }
 
   public static getInstance(): Browser {
@@ -48,17 +43,17 @@ export default class Browser {
   }
 
   public async init() {
-    // this.browser = await puppeteer.launch({
-    //   headless: false,
-    //   args: ['--no-sandbox', '--disable-setuid-sandbox'],
-    // });
-    // try {
-    //   await this.login();
-    //   console.log('logged in');
-    // } catch (e) {
-    //   this.logger.error('Account login failed!');
-    //   console.log(e);
-    // }
+    this.browser = await puppeteer.launch({
+      headless: false,
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    });
+    try {
+      await this.login();
+      console.log('logged in');
+    } catch (e) {
+      this.logger.error('Account login failed!');
+      console.log(e);
+    }
   }
 
   public getBrowser(): PBrowser {

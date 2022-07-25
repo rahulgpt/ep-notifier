@@ -8,6 +8,9 @@ export interface ICommand {
   readonly name: string;
   readonly description: string;
   readonly args: CommandArgType[];
+  readonly roles: string[];
+  readonly permissions: string[];
+  readonly ownerOnly: boolean;
 
   run(args: CommandCallbackArguments): Promise<string | void>;
 }
@@ -18,6 +21,9 @@ export default class Command implements ICommand {
   public readonly name: string;
   public readonly description: string = '';
   public readonly args: CommandArgType[];
+  public readonly roles;
+  public readonly permissions;
+  public readonly ownerOnly;
 
   constructor(options: CommandOptions) {
     this.id = ++Command.id;
@@ -25,6 +31,9 @@ export default class Command implements ICommand {
     this.name = options.name;
     this.args = options.args;
     this.description = options.description || this.description;
+    this.roles = options.roles || [];
+    this.permissions = options.permissions || [];
+    this.ownerOnly = options.ownerOnly || false;
   }
 
   public async run(args: CommandCallbackArguments): Promise<string | void> {}

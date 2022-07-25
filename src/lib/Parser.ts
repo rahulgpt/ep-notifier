@@ -1,9 +1,15 @@
-import { Client, Message } from 'discord.js';
+import {
+  Client,
+  Message,
+  GuildMember,
+  MessageEmbed,
+  MessageManager,
+} from 'discord.js';
 import Logger, { ILogger } from './Logger';
 import { ICommand } from './Command';
 import path from 'path';
 import fs from 'fs';
-import { ParserOptions } from './types';
+import { CommandOptionTypes, ParserOptions } from './types';
 import GenericMessage from './GenericMessage';
 
 export default class Parser {
@@ -60,36 +66,53 @@ export default class Parser {
     this.logger.success('Command Map generated!');
   }
 
-  private validateUserPermissions() {}
+  private validateUserPermissions(
+    command: ICommand,
+    member: GuildMember
+  ): boolean {
+    if (!command.permissions) return true;
 
-  private validateUserRoles() {}
+    for (const perm in command.permissions) {
+      // if (!member.permissions.has(perm)) return false;
+    }
+
+    return true;
+  }
+
+  private validateUserRoles(command: ICommand, member: GuildMember): boolean {
+    if (!command.roles) return true;
+    for (const role in command.roles) {
+      if (!member.roles.cache.has(role)) return false;
+    }
+    return true;
+  }
 
   private validateArgs(
     command: ICommand,
-    args: string[],
+    args: any[],
     message: Message
-  ): boolean {
+  ): [boolean, any[]] {
     // reorder args
-
     const parsedArgs = [];
-    const requiredArgs = command.args.filter(el => el.required);
+
+    const requiredArgs = command.args.filter(el => el.required).length;
 
     // check for missing args
-    if (requiredArgs.length !== args.length) {
+    if (requiredArgs > args.length) {
       GenericMessage.sendError(
         message,
         command,
         `Missing arguments`,
-        `I need ${requiredArgs.length} ${
-          requiredArgs.length === 1 ? 'argument' : 'arguments'
+        `I need ${requiredArgs} ${
+          requiredArgs === 1 ? 'argument' : 'arguments'
         } for this command.`
       );
-      return false;
+      return [false, []];
     }
 
-    // check if the args are valid
+    // check if the args types are valid
     for (let i = 0; i < args.length; i++) {
-      if (requiredArgs[i].type === 'bool') {
+      if (command.args[i].type === CommandOptionTypes.BOOL) {
         if (!(args[i] === 'true' || args[i] === 'false')) {
           GenericMessage.sendError(
             message,
@@ -97,12 +120,12 @@ export default class Parser {
             'Non boolean value',
             `Received a non boolean value for boolean argument. Valid boolean values are **true and false**`
           );
-          return false;
+          return [false, []];
         }
         parsedArgs.push(args[i] === 'false' ? false : true);
       }
 
-      if (requiredArgs[i].type === 'number') {
+      if (command.args[i].type === CommandOptionTypes.NUMBER) {
         if (isNaN(+args[i])) {
           GenericMessage.sendError(
             message,
@@ -110,13 +133,77 @@ export default class Parser {
             'Non Number value',
             `Received a non number value for number argument.`
           );
-          return false;
+          return [false, []];
         }
         parsedArgs.push(+args[i]);
       }
+
+      if (command.args[i].type === CommandOptionTypes.KAYO_DRIVE_URL) {
+        if (!/drive.google.com/g.test(args[i])) {
+          GenericMessage.sendError(
+            message,
+            command,
+            'Bad KayoDriveUrl',
+            'Received a non kayo drive url. The url should be a google drive url from kayoanime.com.'
+          );
+          return [false, []];
+        }
+        parsedArgs.push(args[i].replace(/<|>/g, ''));
+      }
+
+      if (command.args[i].type === CommandOptionTypes.GOGO_URL) {
+        if (!/gogoanime|category/g.test(args[i])) {
+          GenericMessage.sendError(
+            message,
+            command,
+            'Bad GogoAnimeUrl',
+            'Received a non gogo anime url. The url should be a gogoanime anime info url, and must container (gogoanime|category).'
+          );
+          return [false, []];
+        }
+        parsedArgs.push(args[i].replace(/<|>/g, ''));
+      }
+
+      parsedArgs.push(args[i]);
     }
 
-    return true;
+    return [true, parsedArgs];
+  }
+
+  private async generateHelp(message: Message) {
+    let embed = new MessageEmbed({ color: 0xd24d7e, title: 'Help' });
+
+    this.commandMap.forEach(command => {
+      let argsString = '';
+
+      command.args.forEach(arg => {
+        argsString += `<${arg.name} : ${arg.type}>${arg.required ? '' : '?'} `;
+      });
+
+      embed.addField(
+        `${process.env.DEFAULT_PREFIX}${command.name} ${argsString}`,
+        command.description
+      );
+    });
+
+    message.channel.send({ embeds: [embed] });
+  }
+
+  private async generateDetailHelp(message: Message, command: ICommand) {
+    let argsString = '';
+
+    for (let i = 0; i < command.args.length; i++) {
+      const arg = command.args[i];
+      argsString += `<${arg.name} : ${arg.type}>${arg.required ? '' : '?'} `;
+    }
+
+    let embed = new MessageEmbed({
+      color: 0xd24d7e,
+      title: `Help - ${command.name}`,
+      description: `${command.description}\nFormat: ${process.env.DEFAULT_PREFIX}${command.name} ${argsString}\nOwner Only: ${command.ownerOnly}`,
+    });
+
+    return message.channel.send({ embeds: [embed] });
   }
 
   public async parseCommand(message: Message) {
@@ -124,17 +211,65 @@ export default class Parser {
 
     if (message.author.bot) return;
 
-    const args: string[] = content.split(/[ ]+/);
-    const name: string | undefined = args?.shift()?.toLowerCase();
+    const _args: string[] = content.split(/[ ]+/);
+    const name: string | undefined = _args?.shift()?.toLowerCase();
 
     const prefix: string = process.env.DEFAULT_PREFIX || ';';
 
     if (!name?.startsWith(prefix)) return;
 
+    if (name.replace(prefix, '').toLowerCase() === 'help') {
+      if (_args[0]) {
+        if (!this.commandMap.has(_args[0])) {
+          await channel.send({
+            embeds: [
+              new MessageEmbed({
+                description: `${_args[0]} command does not exist. Type ${prefix}help to see the list of commands`,
+                color: 0x2f3136,
+              }),
+            ],
+          });
+          return;
+        }
+        await this.generateDetailHelp(message, this.commandMap.get(_args[0])!);
+      } else {
+        await this.generateHelp(message);
+      }
+
+      return;
+    }
+
     const command = this.commandMap.get(name.replace(prefix, ''));
     if (!command) return;
 
-    if (!this.validateArgs(command, args, message)) return;
+    const [isArgsValid, args] = this.validateArgs(command, _args, message);
+
+    if (!isArgsValid) return;
+
+    // if (!this.validateUserPermissions(command, memeber)) {
+    //   return;
+    // }
+
+    if (!this.validateUserRoles(command, member!)) {
+      GenericMessage.sendError(
+        message,
+        command,
+        'Required Role Not Found',
+        'You do not have the required role to execute this command'
+      );
+      return;
+    }
+
+    if (command.ownerOnly) {
+      if (member!?.id !== process.env.OWNER_ID) {
+        GenericMessage.sendError(
+          message,
+          command,
+          'Owner Only Command',
+          'This command is flagged as owner only.'
+        );
+      }
+    }
 
     // execute the command
     const returnMessage = await command.run({
@@ -145,7 +280,12 @@ export default class Parser {
     });
 
     try {
-      if (returnMessage) channel.send(returnMessage);
+      if (returnMessage)
+        await channel.send({
+          embeds: [
+            new MessageEmbed({ description: returnMessage, color: 0x2f3136 }),
+          ],
+        });
     } catch (e) {
       console.log(e);
     }

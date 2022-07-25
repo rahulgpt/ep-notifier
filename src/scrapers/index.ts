@@ -1,3 +1,3 @@
 export interface IScraper {
-  getEpisodeCount(): Promise<number>;
+  getEpisodeCount(url: string): Promise<number>;
 }

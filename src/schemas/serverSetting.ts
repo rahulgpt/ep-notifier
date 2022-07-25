@@ -2,9 +2,12 @@ import mongoose from 'mongoose';
 
 const Schema = mongoose.Schema;
 
-interface IServerSettings {
+export interface IServerSettings {
   serverId: string;
   prefix: string;
+  updateChannel: string;
+  addAnimeRole: string;
+  owner: string;
 }
 
 const ServerSettingSchema = new Schema<IServerSettings>({
@@ -12,4 +15,7 @@ const ServerSettingSchema = new Schema<IServerSettings>({
   prefix: String,
 });
 
-export default mongoose.model('ServerSetting', ServerSettingSchema);
+export default mongoose.model<IServerSettings>(
+  'ServerSetting',
+  ServerSettingSchema
+);

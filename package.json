@@ -1,7 +1,7 @@
 {
   "name": "ep-notifier",
   "version": "1.0.0",
-  "description": "A discord bot that notifies on new episodes on kayoanime",
+  "description": "Discord bot for checking anime ep updates",
   "main": "index.js",
   "scripts": {
     "start": "node ./out/index.js",
@@ -18,11 +18,16 @@
     "discord.js": "^13.6.0",
     "dotenv": "^16.0.0",
     "mongoose": "^6.3.0",
+    "node-cron": "^3.0.1",
     "puppeteer": "^13.7.0",
     "puppeteer-extra": "^3.2.3",
-    "puppeteer-extra-plugin-stealth": "^2.9.0"
+    "puppeteer-extra-plugin-stealth": "^2.9.0",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
+    "@types/mongoose": "^5.11.97",
+    "@types/node-cron": "^3.0.2",
+    "@types/uuid": "^8.3.4",
     "nodemon": "^2.0.15",
     "ts-node": "^10.9.1"
   }
