@@ -6,6 +6,7 @@ import {
   PartialDMChannel,
   TextChannel,
   ThreadChannel,
+  VoiceChannel,
 } from 'discord.js';
 
 export type CommandOptions = {
@@ -38,7 +39,8 @@ export type CommandCallbackArguments = {
     | PartialDMChannel
     | NewsChannel
     | TextChannel
-    | ThreadChannel;
+    | ThreadChannel
+    | VoiceChannel;
   client: Client;
   args: any[];
 };
