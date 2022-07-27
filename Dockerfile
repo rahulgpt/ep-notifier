@@ -7,11 +7,12 @@ RUN apt-get update && apt-get install -yq chromium gconf-service libasound2 liba
 WORKDIR /app
 
 # Copy package.json into app folder
-COPY package.json /app
-
-RUN npm install 
+COPY package.json .
+RUN npm i 
 
 COPY . .
+RUN npm run build
+
 
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
 ENV PUPPETEER_EXECUTABLE_PATH /usr/bin/chromium
@@ -22,4 +23,4 @@ EXPOSE 3000
 # Assuming script has `--no-sandbox` and `--disable-setuid-sandbox` arguments 
 # and running as root user.
 # Start script on Xvfb
-CMD xvfb-run -a --server-args="-screen 0 1280x800x24" npm run build && npm start
+CMD xvfb-run -a --server-args="-screen 0 1280x800x24" npm start
