@@ -9,6 +9,8 @@ export interface IAnime {
   lastChecked?: string;
   episodeCount?: number;
   schedule: boolean;
+  fullTitle: string;
+  image: string;
 }
 
 const AnimeSchema = new Schema<IAnime>({
@@ -18,6 +20,8 @@ const AnimeSchema = new Schema<IAnime>({
   lastChecked: String,
   episodeCount: Number,
   schedule: { type: Boolean, default: true },
+  fullTitle: String,
+  image: String,
 });
 
 export default mongoose.model<IAnime>('Anime', AnimeSchema);

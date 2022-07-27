@@ -16,6 +16,7 @@ export default class Parser {
   private readonly client: Client;
   private readonly logger: ILogger;
   private readonly commandMap = new Map<string, ICommand>();
+  private readonly aliasMap = new Map<string, string>();
   public readonly commandSearchPaths: string[];
 
   constructor(client: Client, options: ParserOptions) {
@@ -58,10 +59,12 @@ export default class Parser {
         this.logger.warning(
           `A command with name "${obj.name}" already exist in command map. One of them will not be registered in command map.`
         );
-      this.commandMap.set(obj.name, obj);
+      this.commandMap.set(obj.name.toLowerCase(), obj);
+      obj.alias.forEach(alias => this.aliasMap.set(alias, obj.name));
     });
 
     console.log(this.commandMap);
+    console.log(this.aliasMap);
 
     this.logger.success('Command Map generated!');
   }
@@ -103,15 +106,15 @@ export default class Parser {
         message,
         command,
         `Missing arguments`,
-        `I need ${requiredArgs} ${
-          requiredArgs === 1 ? 'argument' : 'arguments'
+        `Need ${requiredArgs} ${
+          requiredArgs === 1 ? 'more argument' : 'more arguments'
         } for this command.`
       );
       return [false, []];
     }
 
     // check if the args types are valid
-    for (let i = 0; i < args.length; i++) {
+    for (let i = 0; i < command.args.length; i++) {
       if (command.args[i].type === CommandOptionTypes.BOOL) {
         if (!(args[i] === 'true' || args[i] === 'false')) {
           GenericMessage.sendError(
@@ -123,6 +126,7 @@ export default class Parser {
           return [false, []];
         }
         parsedArgs.push(args[i] === 'false' ? false : true);
+        continue;
       }
 
       if (command.args[i].type === CommandOptionTypes.NUMBER) {
@@ -136,6 +140,7 @@ export default class Parser {
           return [false, []];
         }
         parsedArgs.push(+args[i]);
+        continue;
       }
 
       if (command.args[i].type === CommandOptionTypes.KAYO_DRIVE_URL) {
@@ -149,6 +154,7 @@ export default class Parser {
           return [false, []];
         }
         parsedArgs.push(args[i].replace(/<|>/g, ''));
+        continue;
       }
 
       if (command.args[i].type === CommandOptionTypes.GOGO_URL) {
@@ -162,9 +168,10 @@ export default class Parser {
           return [false, []];
         }
         parsedArgs.push(args[i].replace(/<|>/g, ''));
+        continue;
       }
 
-      parsedArgs.push(args[i]);
+      parsedArgs.push(args[i].replace(/\s+/g, ''));
     }
 
     return [true, parsedArgs];
@@ -194,13 +201,19 @@ export default class Parser {
 
     for (let i = 0; i < command.args.length; i++) {
       const arg = command.args[i];
-      argsString += `<${arg.name} : ${arg.type}>${arg.required ? '' : '?'} `;
+      argsString += `<${arg.name}:${arg.type}>${arg.required ? '' : '?'} `;
     }
 
     let embed = new MessageEmbed({
       color: 0xd24d7e,
       title: `Help - ${command.name}`,
-      description: `${command.description}\nFormat: ${process.env.DEFAULT_PREFIX}${command.name} ${argsString}\nOwner Only: ${command.ownerOnly}`,
+      description: `${command.description}\n**Format:** \`${
+        process.env.DEFAULT_PREFIX
+      }${command.name} ${argsString}\`\n**Owner Only:** \`${
+        command.ownerOnly
+      }\`\n**Prefix:** \`${
+        command.alias.length ? command.alias.join(', ') : 'None'
+      }\``,
     });
 
     return message.channel.send({ embeds: [embed] });
@@ -218,9 +231,16 @@ export default class Parser {
 
     if (!name?.startsWith(prefix)) return;
 
-    if (name.replace(prefix, '').toLowerCase() === 'help') {
+    if (
+      name.replace(prefix, '').toLowerCase() === 'help' ||
+      name.replace(prefix, '').toLowerCase() === 'h'
+    ) {
       if (_args[0]) {
-        if (!this.commandMap.has(_args[0])) {
+        if (
+          !this.commandMap.has(
+            this.aliasMap.get(_args[0].toLowerCase()) || _args[0].toLowerCase()
+          )
+        ) {
           await channel.send({
             embeds: [
               new MessageEmbed({
@@ -231,7 +251,12 @@ export default class Parser {
           });
           return;
         }
-        await this.generateDetailHelp(message, this.commandMap.get(_args[0])!);
+        await this.generateDetailHelp(
+          message,
+          this.commandMap.get(
+            this.aliasMap.get(_args[0].toLowerCase()) || _args[0].toLowerCase()
+          )!
+        );
       } else {
         await this.generateHelp(message);
       }
@@ -239,8 +264,25 @@ export default class Parser {
       return;
     }
 
-    const command = this.commandMap.get(name.replace(prefix, ''));
+    let resolvedName =
+      this.aliasMap.get(name.replace(prefix, '')) || name.replace(prefix, '');
+    resolvedName = resolvedName.toLowerCase();
+
+    const command = this.commandMap.get(resolvedName);
     if (!command) return;
+
+    if (command.ownerOnly) {
+      if (member!?.id !== process.env.OWNER_ID) {
+        GenericMessage.sendError(
+          message,
+          command,
+          'Owner Only Command',
+          'This command is flagged as owner only.'
+        );
+
+        return;
+      }
+    }
 
     const [isArgsValid, args] = this.validateArgs(command, _args, message);
 
@@ -258,17 +300,6 @@ export default class Parser {
         'You do not have the required role to execute this command'
       );
       return;
-    }
-
-    if (command.ownerOnly) {
-      if (member!?.id !== process.env.OWNER_ID) {
-        GenericMessage.sendError(
-          message,
-          command,
-          'Owner Only Command',
-          'This command is flagged as owner only.'
-        );
-      }
     }
 
     // execute the command

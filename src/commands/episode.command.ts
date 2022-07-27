@@ -1,3 +1,5 @@
+import axios from 'axios';
+import { MessageEmbed } from 'discord.js';
 import { Command } from '../lib';
 import GenericMessage from '../lib/GenericMessage';
 import { CommandCallbackArguments, CommandOptionTypes } from '../lib/types';
@@ -11,13 +13,29 @@ export default class Episode extends Command {
       args: [
         { name: 'anime', required: true, type: CommandOptionTypes.STRING },
       ],
+      alias: ['ep'],
     });
   }
 
   public async run({ args, message }: CommandCallbackArguments) {
     const [title] = args;
-
     const result = await anime.findOne({ title });
+
+    const embed = new MessageEmbed({
+      color: 0x2f3136,
+      title: `${result?.fullTitle || title.toUpperCase()} Episode Count`,
+      fields: [
+        {
+          name: 'Kayo Episode Count',
+          value: ` ${result?.episodeCount ?? '?'}`,
+          inline: true,
+        },
+      ],
+    });
+
+    if (result?.image) {
+      embed.setThumbnail(result.image);
+    }
 
     if (!result) {
       GenericMessage.sendError(
@@ -29,9 +47,6 @@ export default class Episode extends Command {
       return;
     }
 
-    GenericMessage.sendSuccess(
-      message,
-      `Episode Count: ${result?.episodeCount ?? '?'}`
-    );
+    message.channel.send({ embeds: [embed] });
   }
 }

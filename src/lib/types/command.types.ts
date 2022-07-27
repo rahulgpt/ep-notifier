@@ -10,12 +10,13 @@ import {
 } from 'discord.js';
 
 export type CommandOptions = {
+  alias?: string[];
   ownerOnly?: boolean;
   permissions?: string[];
   roles?: string[];
   name: string;
   description?: string;
-  args: CommandArgType[];
+  args?: CommandArgType[];
 };
 
 export type CommandArgType = {

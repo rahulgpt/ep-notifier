@@ -5,17 +5,13 @@ import Logger, { ILogger } from './Logger';
 import path from 'path';
 import fs from 'fs';
 import Database from './Database';
-import Browser from './Browser';
-import Schedular from './Schedular';
 
 export default class Client {
   private static instance: Client;
   private readonly client: Discord.Client;
   public readonly parser: Parser;
   public readonly database: Database;
-  public readonly schedular: Schedular;
   private readonly logger: ILogger = new Logger(this);
-  private readonly browser: Browser;
   private readonly commandSearchPaths: string[] = [
     path.join(__dirname + '/../commands'),
   ];
@@ -25,14 +21,12 @@ export default class Client {
     dotenv.config();
 
     this.database = Database.getInstance();
-    this.browser = Browser.getInstance();
     this.client = new Discord.Client({
       intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES],
     });
     this.parser = new Parser(this.client, {
       commandSearchPaths: this.commandSearchPaths,
     });
-    this.schedular = Schedular.getInstance();
 
     this.client.on('ready', () => console.log('Ready'));
 
@@ -43,9 +37,7 @@ export default class Client {
 
   public async init() {
     await this.database.init();
-    await this.browser.init();
     this.client.login(process.env.DISCORD_TOKEN);
-    // this.schedular.schedule();
   }
 
   public static getInstance(): Client {
@@ -67,9 +59,5 @@ export default class Client {
 
   public getClient() {
     return this.client;
-  }
-
-  public getBrowser() {
-    return this.browser;
   }
 }

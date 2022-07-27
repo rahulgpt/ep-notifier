@@ -16,6 +16,7 @@ export default class Fetch extends Command {
           type: CommandOptionTypes.STRING,
         },
       ],
+      alias: ['latest', 'f'],
       ownerOnly: true,
     });
   }

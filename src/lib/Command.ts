@@ -11,6 +11,7 @@ export interface ICommand {
   readonly roles: string[];
   readonly permissions: string[];
   readonly ownerOnly: boolean;
+  readonly alias: string[];
 
   run(args: CommandCallbackArguments): Promise<string | void>;
 }
@@ -24,16 +25,18 @@ export default class Command implements ICommand {
   public readonly roles;
   public readonly permissions;
   public readonly ownerOnly;
+  public readonly alias;
 
   constructor(options: CommandOptions) {
     this.id = ++Command.id;
 
     this.name = options.name;
-    this.args = options.args;
+    this.args = options.args || [];
     this.description = options.description || this.description;
     this.roles = options.roles || [];
     this.permissions = options.permissions || [];
     this.ownerOnly = options.ownerOnly || false;
+    this.alias = options.alias || [];
   }
 
   public async run(args: CommandCallbackArguments): Promise<string | void> {}
