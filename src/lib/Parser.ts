@@ -114,7 +114,7 @@ export default class Parser {
     }
 
     // check if the args types are valid
-    for (let i = 0; i < command.args.length; i++) {
+    for (let i = 0; i < args.length && i < command.args.length; i++) {
       if (command.args[i].type === CommandOptionTypes.BOOL) {
         if (!(args[i] === 'true' || args[i] === 'false')) {
           GenericMessage.sendError(
