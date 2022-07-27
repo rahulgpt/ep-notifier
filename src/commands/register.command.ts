@@ -32,7 +32,7 @@ export default class Register extends Command {
   }
 
   public async run({ message, args }: CommandCallbackArguments) {
-    const [title, kayoDriveUrl, uFullTitle, image] = args;
+    const [title, kayoDriveUrl, uFullTitle, uimage] = args;
 
     const anim = await anime.findOne({ title });
     if (anim) {
@@ -47,6 +47,7 @@ export default class Register extends Command {
 
     // parse kitsuTitle
     const fullTitle = uFullTitle.replace(/,/g, ' ');
+    const image = uimage.replace(/<|>/g, '');
 
     try {
       (await anime.create({ title, kayoDriveUrl, fullTitle, image })).save();
