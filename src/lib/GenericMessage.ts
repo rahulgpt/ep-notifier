@@ -8,7 +8,7 @@ export default class GenericMessage {
     reason: string,
     content: string
   ) {
-    const embed = new MessageEmbed({ color: 0xd24d7e });
+    const embed = new MessageEmbed({ color: 0x2f3136 });
 
     let argsString = '';
 
@@ -32,7 +32,7 @@ export default class GenericMessage {
   }
 
   public static sendSuccess(message: Message, content: string) {
-    const embed = new MessageEmbed({ color: 0xd24d7e });
+    const embed = new MessageEmbed({ color: 0x2f3136 });
 
     embed.title = 'Success';
     embed.description = content;
