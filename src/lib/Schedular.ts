@@ -1,16 +1,19 @@
 import cron from 'node-cron';
 import KayoScraper from '../scrapers/KayoScraper';
 import AnimeService from '../services/anime';
+import Logger from './Logger';
 import Updator from './Updator';
 
 export default class Schedular {
   private static instance: Schedular;
   private readonly scheduleTime: string;
+  private readonly logger = new Logger(this);
   private readonly animeService = AnimeService.getInstance();
   private readonly updator = Updator.getInstance();
 
   private constructor() {
     this.scheduleTime = process.env.SCHEDULE_TIME || '*/10 * * * *';
+    console.log(this.scheduleTime);
   }
 
   public static getInstance() {
@@ -26,7 +29,7 @@ export default class Schedular {
 
       let kayoScraper = KayoScraper.getInstance();
 
-      animes.forEach(async anime => {
+      for (const anime of animes) {
         if (anime.schedule) {
           const episodeCount = await kayoScraper.getEpisodeCount(
             anime.kayoDriveUrl
@@ -45,7 +48,7 @@ export default class Schedular {
           // update the episode count in db
           this.animeService.updateCount(anime.title, episodeCount);
         }
-      });
+      }
     });
   }
 }
