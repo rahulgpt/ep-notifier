@@ -28,7 +28,6 @@ export default class Fetch extends Command {
 
     if (animeTitle) {
       const result = await animeM.findOne({ title: animeTitle });
-      console.log(result);
       animeToFetch.push(result);
     } else {
       animeToFetch = await animeM.find({});

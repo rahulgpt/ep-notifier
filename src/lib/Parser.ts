@@ -64,7 +64,6 @@ export default class Parser {
     });
 
     console.log(this.commandMap);
-    console.log(this.aliasMap);
 
     this.logger.success('Command Map generated!');
   }
@@ -318,7 +317,7 @@ export default class Parser {
           ],
         });
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
   }
 }

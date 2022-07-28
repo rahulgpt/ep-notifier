@@ -11,7 +11,6 @@ export default class Schedular {
 
   private constructor() {
     this.scheduleTime = process.env.SCHEDULE_TIME || '*/10 * * * *';
-    console.log(this.scheduleTime);
   }
 
   public static getInstance() {
