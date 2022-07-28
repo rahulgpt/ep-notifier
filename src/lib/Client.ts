@@ -37,7 +37,11 @@ export default class Client {
 
   public async init() {
     await this.database.init();
-    this.client.login(process.env.DISCORD_TOKEN);
+    await this.client.login(process.env.DISCORD_TOKEN);
+
+    this.client.user?.setActivity('kayoanime for updates 👀', {
+      type: 'WATCHING',
+    });
   }
 
   public static getInstance(): Client {

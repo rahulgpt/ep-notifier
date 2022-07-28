@@ -177,7 +177,7 @@ export default class Parser {
   }
 
   private async generateHelp(message: Message) {
-    let embed = new MessageEmbed({ color: 0xd24d7e, title: 'Help' });
+    let embed = new MessageEmbed({ color: 0x2f3136, title: 'Command List' });
 
     this.commandMap.forEach(command => {
       let argsString = '';
@@ -204,7 +204,7 @@ export default class Parser {
     }
 
     let embed = new MessageEmbed({
-      color: 0xd24d7e,
+      color: 0x2f3136,
       title: `Help - ${command.name}`,
       description: `${command.description}\n**Format:** \`${
         process.env.DEFAULT_PREFIX
