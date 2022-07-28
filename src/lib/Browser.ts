@@ -52,7 +52,7 @@ export default class Browser {
       console.log('logged in');
     } catch (e) {
       this.logger.error('Account login failed!');
-      console.log(e);
+      console.error(e);
     }
   }
 

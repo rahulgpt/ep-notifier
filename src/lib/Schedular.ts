@@ -29,13 +29,13 @@ export default class Schedular {
 
       let kayoScraper = KayoScraper.getInstance();
 
-      animes.forEach(async anime => {
+      for (const anime of animes) {
         if (anime.schedule) {
           const episodeCount = await kayoScraper.getEpisodeCount(
             anime.kayoDriveUrl
           );
 
-          if ((anime.episodeCount || 0) < episodeCount) {
+          if (anime.episodeCount && anime.episodeCount < episodeCount) {
             // send message to user for new episode
             this.updator.emitUpdate(
               anime.fullTitle || anime.title,
@@ -48,7 +48,7 @@ export default class Schedular {
           // update the episode count in db
           this.animeService.updateCount(anime.title, episodeCount);
         }
-      });
+      }
     });
   }
 }

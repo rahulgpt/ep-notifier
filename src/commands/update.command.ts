@@ -38,13 +38,10 @@ export default class Update extends Command {
       fieldArr[i][1] = fieldArr[i][1].replace(/%1/g, ':');
     }
 
-    console.log(fieldArr);
-
     fieldArr.forEach(field => (updateObj[field[0]] = field[1]));
 
     try {
       const result = await anime.updateOne({ title }, updateObj);
-      console.log(result);
 
       if (result.modifiedCount >= 1)
         GenericMessage.sendSuccess(message, `${title} updated`);
