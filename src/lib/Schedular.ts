@@ -1,13 +1,11 @@
 import cron from 'node-cron';
 import KayoScraper from '../scrapers/KayoScraper';
 import AnimeService from '../services/anime';
-import Logger from './Logger';
 import Updator from './Updator';
 
 export default class Schedular {
   private static instance: Schedular;
   private readonly scheduleTime: string;
-  private readonly logger = new Logger(this);
   private readonly animeService = AnimeService.getInstance();
   private readonly updator = Updator.getInstance();
 
@@ -35,7 +33,7 @@ export default class Schedular {
             anime.kayoDriveUrl
           );
 
-          if ((anime.episodeCount || 0) < episodeCount) {
+          if (anime.episodeCount && anime.episodeCount < episodeCount) {
             // send message to user for new episode
             this.updator.emitUpdate(
               anime.fullTitle || anime.title,
