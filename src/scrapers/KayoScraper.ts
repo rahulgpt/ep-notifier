@@ -19,23 +19,17 @@ export default class KayoScraper implements IScraper {
   public async getEpisodeCount(url: string): Promise<number> {
     const page = await this.browser.newPage();
     const navigationPromise = page.waitForNavigation();
-    await page.goto(url, { waitUntil: 'domcontentloaded' });
+    await page.goto(url);
     await navigationPromise;
 
-    await page.waitForSelector('div.h-sb-Ic.h-R-w-d-ff', { visible: true });
-
     const episodeCount = await page.evaluate(async () => {
-      // Check if the anime drive has a dual audio banner
-      const dualAudioBanner = (
-        document.getElementsByClassName(
-          'h-sb-Ic h-R-w-d-ff'
-        )[0] as HTMLDivElement
-      )?.innerText
-        ?.toLowerCase()
-        ?.includes('dual-audio');
+      const elArr = Array.from(document.getElementsByClassName('Q5txwe'));
+      const dualAudio =
+        (elArr[0] as HTMLDivElement)?.innerText
+          ?.toLowerCase()
+          .includes('dual-audio') || false;
 
-      if (dualAudioBanner) {
-        const elArr = Array.from(document.getElementsByClassName('Q5txwe'));
+      if (dualAudio) {
         const count = elArr.filter((el: any) =>
           el?.innerText?.toLowerCase()?.includes('dual-audio')
         );
