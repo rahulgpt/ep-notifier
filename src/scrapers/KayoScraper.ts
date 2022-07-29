@@ -21,8 +21,9 @@ export default class KayoScraper implements IScraper {
     const navigationPromise = page.waitForNavigation();
     await page.goto(url);
     await navigationPromise;
+    await page.waitForSelector('div.h-sb-Ic.h-R-w-d-ff', { visible: true });
 
-    const episodeCount = await page.evaluate(() => {
+    const episodeCount = await page.evaluate(async () => {
       // Check if the anime drive has a dual audio banner
       const dualAudioBanner = (
         document.getElementsByClassName(
