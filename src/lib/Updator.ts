@@ -6,7 +6,7 @@ export default class Updator {
   private static instance: Updator;
   private client!: Client;
   private readonly updateChannel: string =
-    process.env.UPDATE_CHANNEL || '1001838092342280212';
+    process.env.UPDATE_CHANNEL || '1002494948135940196';
   private readonly logger = new Logger(this);
 
   private constructor() {

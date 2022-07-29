@@ -212,7 +212,7 @@ export default class Parser {
         process.env.DEFAULT_PREFIX
       }${command.name} ${argsString}\`\n**Owner Only:** \`${
         command.ownerOnly
-      }\`\n**Prefix:** \`${
+      }\`\n**Alias:** \`${
         command.alias.length ? command.alias.join(', ') : 'None'
       }\``,
     });

@@ -38,7 +38,7 @@ export default class KayoScraper implements IScraper {
           el?.innerText?.toLowerCase()?.includes('dual-audio')
         );
 
-        return count.length
+        return count.length > 0
           ? count.length
           : document.getElementsByClassName('iZmuQc')[0].childElementCount;
       }
