@@ -19,11 +19,13 @@ export default class GenericMessage {
 
     embed.title = `Error`;
     embed.description = `${content}`;
-    embed.addField('Reason', reason);
-    embed.addField(
-      'Format',
-      `${process.env.DEFAULT_PREFIX}${command.name} ${argsString}`
-    );
+    embed.addFields([
+      { name: 'Reason', value: reason },
+      {
+        name: 'Format',
+        value: `${process.env.DEFAULT_PREFIX}${command.name} ${argsString}`,
+      },
+    ]);
     // embed.thumbnail = {
     //   url: 'https://media.discordapp.net/attachments/969222381317021746/969226663424585728/92428e727dc23064444954523ce2a970.jpg',
     // };

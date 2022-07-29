@@ -186,10 +186,12 @@ export default class Parser {
         argsString += `<${arg.name} : ${arg.type}>${arg.required ? '' : '?'} `;
       });
 
-      embed.addField(
-        `${process.env.DEFAULT_PREFIX}${command.name} ${argsString}`,
-        command.description
-      );
+      embed.addFields([
+        {
+          name: `${process.env.DEFAULT_PREFIX}${command.name} ${argsString}`,
+          value: command.description,
+        },
+      ]);
     });
 
     message.channel.send({ embeds: [embed] });

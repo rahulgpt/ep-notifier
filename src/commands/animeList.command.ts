@@ -26,7 +26,13 @@ export default class AnimeList extends Command {
 
     result?.forEach(anime => {
       // desc += `**${anime.title}**`;
-      embed.addField(anime.title, anime.fullTitle || anime.title, true);
+      embed.addFields([
+        {
+          name: anime.title,
+          value: anime.fullTitle || anime.title,
+          inline: true,
+        },
+      ]);
     });
 
     // embed.setDescription(desc);
