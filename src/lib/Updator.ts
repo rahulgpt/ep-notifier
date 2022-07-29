@@ -1,7 +1,6 @@
 import Client from './Client';
 import Logger from './Logger';
 import { MessageEmbed, TextChannel } from 'discord.js';
-import axios from 'axios';
 
 export default class Updator {
   private static instance: Updator;

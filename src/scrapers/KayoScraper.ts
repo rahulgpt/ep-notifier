@@ -23,6 +23,26 @@ export default class KayoScraper implements IScraper {
     await navigationPromise;
 
     const episodeCount = await page.evaluate(() => {
+      // Check if the anime drive has a dual audio banner
+      const dualAudioBanner = (
+        document.getElementsByClassName(
+          'h-sb-Ic h-R-w-d-ff'
+        )[0] as HTMLDivElement
+      )?.innerText
+        ?.toLowerCase()
+        ?.includes('dual-audio');
+
+      if (dualAudioBanner) {
+        const elArr = Array.from(document.getElementsByClassName('Q5txwe'));
+        const count = elArr.filter((el: any) =>
+          el?.innerText?.toLowerCase()?.includes('dual-audio')
+        );
+
+        return count.length
+          ? count.length
+          : document.getElementsByClassName('iZmuQc')[0].childElementCount;
+      }
+
       return document.getElementsByClassName('iZmuQc')[0].childElementCount;
     });
 
