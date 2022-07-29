@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { MessageEmbed } from 'discord.js';
 import { Command } from '../lib';
 import GenericMessage from '../lib/GenericMessage';
