@@ -19,8 +19,9 @@ export default class KayoScraper implements IScraper {
   public async getEpisodeCount(url: string): Promise<number> {
     const page = await this.browser.newPage();
     const navigationPromise = page.waitForNavigation();
-    await page.goto(url);
+    await page.goto(url, { waitUntil: 'domcontentloaded' });
     await navigationPromise;
+
     await page.waitForSelector('div.h-sb-Ic.h-R-w-d-ff', { visible: true });
 
     const episodeCount = await page.evaluate(async () => {
