@@ -17,7 +17,7 @@
     "chalk": "4.1.2",
     "discord.js": "^13.6.0",
     "dotenv": "^16.0.0",
-    "mongoose": "^6.3.0",
+    "mongoose": "^6.11.3",
     "node-cron": "^3.0.1",
     "puppeteer": "^13.7.0",
     "puppeteer-extra": "^3.2.3",
